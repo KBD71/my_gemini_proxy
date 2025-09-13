@@ -1,44 +1,36 @@
-// Google AI SDK를 가져옵니다.
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// 서버리스 함수 핸들러
 export default async function handler(request, response) {
-  // CORS 헤더 설정: 모든 출처에서의 요청을 허용합니다.
+  // CORS 헤더 설정 (어떤 웹사이트든 이 서버를 호출할 수 있게 허용)
   response.setHeader('Access-Control-Allow-Origin', '*');
-  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  // 브라우저가 본 요청을 보내기 전에 보내는 OPTIONS 요청 (preflight) 처리
   if (request.method === 'OPTIONS') {
     return response.status(200).end();
   }
 
-  // POST 요청이 아닐 경우 에러 처리
-  if (request.method !== 'POST') {
-    return response.status(405).json({ message: 'POST 요청만 허용됩니다.' });
+  // 1. '신분증' 검사: 우리 웹사이트가 보낸 요청이 맞는지 확인
+  const clientToken = request.headers['authorization'];
+  const serverToken = `Bearer ${process.env.MY_SECRET_TOKEN}`;
+  if (clientToken !== serverToken) {
+    return response.status(401).json({ error: '인증되지 않은 요청입니다.' });
   }
 
   try {
-    // 1. 환경 변수에서 Gemini API 키를 안전하게 불러옵니다.
+    // 2. '금고 열쇠' 사용: Vercel에 안전하게 저장된 Gemini API 키 불러오기
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-    // 2. 클라이언트(챗봇 UI)가 보낸 메시지를 가져옵니다.
     const { prompt } = request.body;
-    if (!prompt) {
-      return response.status(400).json({ error: '프롬프트가 없습니다.' });
-    }
-
-    // 3. Gemini 모델을 선택하고 API를 호출합니다.
+    
+    // 3. Gemini에게 질문하고 답변 받기
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const result = await model.generateContent(prompt);
     const geminiResponse = await result.response;
     const text = geminiResponse.text();
 
-    // 4. Gemini의 답변을 클라이언트로 다시 보내줍니다.
+    // 4. 결과를 다시 웹사이트로 보내주기
     response.status(200).json({ text });
-
   } catch (error) {
-    console.error('API 호출 중 에러 발생:', error);
     response.status(500).json({ error: '서버 내부 오류가 발생했습니다.' });
   }
 }
