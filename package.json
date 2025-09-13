@@ -1,0 +1,17 @@
+{
+  "name": "my-gemini-proxy",
+  "version": "1.0.0",
+  "description": "Gemini AI Proxy Server",
+  "main": "api/chat.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.12.0"
+  },
+  "keywords": ["gemini", "ai", "proxy", "vercel"],
+  "author": "",
+  "license": "MIT"
+}

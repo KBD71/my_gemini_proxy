@@ -1,5 +1,5 @@
 // --- ‼️ 설정: 이 두 줄은 반드시 본인의 정보로 수정하세요 ‼️ ---
-const API_URL = ' https://vercel.com/bdkims-projects/my-gemini-proxy/G8K2A92o6uihPhxV7AquqW6AWvuf '; // 3단계에서 얻은 내 Vercel 서버 주소
+const API_URL = 'https://my-gemini-proxy.vercel.app/api/chat'; // 3단계에서 얻은 내 Vercel 서버 주소
 const MY_SECRET_TOKEN = 'qudejr0727!'; // 3단계에서 직접 만든 나만의 비밀 토큰
 
 // --- 🤖 챗봇의 정체성 (시스템 프롬프트) ---
